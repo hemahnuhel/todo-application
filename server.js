@@ -8,6 +8,16 @@ const bodyParser = require('body-parser');
 const winston = require('winston');
 const path = require('path');
 
+
+// Redirect root to login page
+app.get('/', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.redirect('/tasks');     // If already logged in → go to tasks
+  } else {
+    res.redirect('/login');     
+  }
+});
+
 // Logger setup
 const logger = winston.createLogger({
   level: 'info',
