@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage your tasks in Todo App">
+  <title>My Tasks - Todo App</title>
+
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container">
+    <header class="page-header">
+      <h1>Welcome back, <%= user.username.charAt(0).toUpperCase() + user.username.slice(1) %>!</h1>
+      <a href="/logout" class="logout" aria-label="Log out">
+        <i class="fas fa-sign-out-alt"></i> Logout
+      </a>
+    </header>
+
+    <% if (messages.success) { %>
+      <div class="message success" role="alert">
+        <%= messages.success %>
+      </div>
+    <% } %>
+
+    <% if (messages.error) { %>
+      <div class="message error" role="alert">
+        <%= messages.error %>
+      </div>
+    <% } %>
+
+    <section class="task-creation">
+      <h2>Create New Task</h2>
+      <form method="POST" action="/tasks/create" class="task-form" novalidate>
+        <div class="form-group">
+          <label for="title" class="sr-only">Task title</label>
+          <input 
+            type="text" 
+            id="title"
+            name="title" 
+            placeholder="What needs to be done?" 
+            required 
+            autofocus
+            autocomplete="off"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="description" class="sr-only">Task description</label>
+          <textarea 
+            id="description"
+            name="description" 
+            placeholder="Add details (optional)" 
+            rows="3"
+            autocomplete="off"
+          ></textarea>
+        </div>
+
+        <button type="submit">
+          <i class="fas fa-plus"></i> Add Task
+        </button>
+      </form>
+    </section>
+
+    <section class="task-filters">
+      <h2>Your Tasks</h2>
+      <div class="filters">
+        <a href="/tasks?sort=pending" 
+           class="filter-link <%= sort === 'pending' ? 'active' : '' %>"
+           aria-current="<%= sort === 'pending' ? 'page' : 'false' %>">
+          Pending
+        </a>
+        <a href="/tasks?sort=completed" 
+           class="filter-link <%= sort === 'completed' ? 'active' : '' %>"
+           aria-current="<%= sort === 'completed' ? 'page' : 'false' %>">
+          Completed
+        </a>
+        <a href="/tasks?sort=all" 
+           class="filter-link <%= sort === 'all' ? 'active' : '' %>"
+           aria-current="<%= sort === 'all' ? 'page' : 'false' %>">
+          All
+        </a>
+      </div>
+    </section>
+
+    <% if (tasks.length === 0) { %>
+      <p class="empty-state">
+        <i class="far fa-lightbulb"></i> No tasks yet. Add one above!
+      </p>
+    <% } else { %>
+      <ul class="task-list" role="list">
+        <% tasks.forEach(task => { %>
+          <li class="task-item <%= task.status === 'completed' ? 'completed' : '' %>" role="listitem">
+            <div class="task-content">
+              <% if (task.status === 'completed') { %>
+                <i class="fas fa-check-circle check-icon" aria-hidden="true"></i>
+              <% } %>
+
+              <div class="task-title">
+                <%= task.title %>
+              </div>
+
+              <% if (task.description) { %>
+                <div class="task-desc">
+                  <%= task.description %>
+                </div>
+              <% } %>
+            </div>
+
+            <div class="task-actions">
+              <% if (task.status === 'pending') { %>
+                <form method="POST" action="/tasks/<%= task._id %>/complete">
+                  <button type="submit" class="btn-complete" title="Mark as completed" aria-label="Mark task as completed">
+                    <i class="fas fa-check"></i> Complete
+                  </button>
+                </form>
+              <% } %>
+
+              <form method="POST" action="/tasks/<%= task._id %>/delete">
+                <button type="submit" class="btn-delete" title="Delete task" aria-label="Delete task">
+                  <i class="fas fa-trash-alt"></i> Delete
+                </button>
+              </form>
+            </div>
+          </li>
+        <% }) %>
+      </ul>
+    <% } %>
+  </div>
+</body>
+</html>
